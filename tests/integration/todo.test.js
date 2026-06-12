@@ -116,6 +116,17 @@ describe('mostrarError', () => {
     mostrarError('Error de prueba', contenedor);
     expect(contenedor.textContent).toBe('Error de prueba');
   });
+function crearLista() {
+  return document.createElement('ul');
+}
+describe('agregarTarea',()=>{
+   it('debe formatear el texto antes de agregarlo (pri. may. sig min")',() => {
+    agregarTarea('eSTudIAR VeRiFIcaCIon de SW',lista);
+    const span = lista.querySelector('.tarea-texto');
+    expect(span.textContent).toBe('Estudiar verificacion de sw');
+  });
+});
+ 
 
   
 });
