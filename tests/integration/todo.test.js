@@ -41,7 +41,12 @@ describe('agregarTarea', () => {
     expect(lista.querySelector('.tarea-texto').textContent).toBe('Aprender vitest');
   });
 
-  
+  it('debe formatear el texto antes de agregarlo (primera mayúscula, siguientes minúsculas)', () => {
+    const resultado = agregarTarea('eSTudIAR VeRiFIcaCIon de SW', lista);
+    expect(resultado.exito).toBe(true);
+    const span = lista.querySelector('.tarea-texto');
+    expect(span.textContent).toBe('Estudiar verificacion de sw');
+  });
 });
 
 describe('eliminarTarea', () => {
@@ -116,17 +121,107 @@ describe('mostrarError', () => {
     mostrarError('Error de prueba', contenedor);
     expect(contenedor.textContent).toBe('Error de prueba');
   });
-function crearLista() {
-  return document.createElement('ul');
-}
-describe('agregarTarea',()=>{
-   it('debe formatear el texto antes de agregarlo (pri. may. sig min")',() => {
-    agregarTarea('eSTudIAR VeRiFIcaCIon de SW',lista);
-    const span = lista.querySelector('.tarea-texto');
-    expect(span.textContent).toBe('Estudiar verificacion de sw');
+});
+
+// ============================================================
+// Pruebas adicionales — Tarea 2
+// ============================================================
+describe('Pruebas adicionales — Tarea 2', () => {
+  it('debe eliminar la tarea de la lista al hacer clic en el botón eliminar', () => {
+    // Arrange
+    const lista = crearLista();
+    agregarTarea('Estudiar vitest', lista);
+    const li = lista.querySelector('.tarea-item');
+    const btnEliminar = li.querySelector('.btn-eliminar');
+
+    // Act
+    btnEliminar.click();
+
+    // Assert
+    expect(lista.children.length).toBe(0);
+  });
+
+  it('debe alternar la clase "completada" cuando el checkbox cambia de estado', () => {
+    // Arrange
+    const li = crearTareaElemento('Estudiar vitest');
+    const checkbox = li.querySelector('.tarea-checkbox');
+
+    // Act - Marcar checkbox y disparar evento change
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change'));
+    // Assert
+    expect(li.classList.contains('completada')).toBe(true);
+
+    // Act - Desmarcar checkbox y disparar evento change
+    checkbox.checked = false;
+    checkbox.dispatchEvent(new Event('change'));
+    // Assert
+    expect(li.classList.contains('completada')).toBe(false);
+  });
+
+  it('debe permitir agregar una tarea con exactamente 200 caracteres', () => {
+    // Arrange
+    const lista = crearLista();
+    const textoLargo = 'A ' + 'B'.repeat(198); // 200 caracteres válidos
+
+    // Act
+    const resultado = agregarTarea(textoLargo, lista);
+
+    // Assert
+    expect(resultado.exito).toBe(true);
+    expect(lista.children.length).toBe(1);
+  });
+
+  it('debe dejar la lista vacía al limpiar completadas si todas están completadas', () => {
+    // Arrange
+    const lista = crearLista();
+    agregarTarea('Primera tarea', lista);
+    agregarTarea('Segunda tarea', lista);
+
+    const items = lista.querySelectorAll('.tarea-item');
+    items.forEach(li => {
+      const checkbox = li.querySelector('.tarea-checkbox');
+      checkbox.checked = true;
+      li.classList.add('completada');
+    });
+
+    // Act
+    const eliminadas = limpiarCompletadas(lista);
+
+    // Assert
+    expect(eliminadas).toBe(2);
+    expect(lista.children.length).toBe(0);
   });
 });
- 
 
-  
+// ============================================================
+// Pruebas adicionales — Tarea 3 (Validación de palabras)
+// ============================================================
+describe('Validación de cantidad de palabras (Tarea 3)', () => {
+  it('debe rechazar una tarea con una sola palabra', () => {
+    // Arrange
+    const lista = crearLista();
+    const texto = 'Estudiar'; // 1 sola palabra
+
+    // Act
+    const resultado = agregarTarea(texto, lista);
+
+    // Assert
+    expect(resultado.exito).toBe(false);
+    expect(resultado.error).toBe('La tarea debe tener al menos 2 palabras.');
+    expect(lista.children.length).toBe(0);
+  });
+
+  it('debe aceptar una tarea con dos o más palabras', () => {
+    // Arrange
+    const lista = crearLista();
+    const texto = 'Estudiar verificación'; // 2 palabras
+
+    // Act
+    const resultado = agregarTarea(texto, lista);
+
+    // Assert
+    expect(resultado.exito).toBe(true);
+    expect(lista.children.length).toBe(1);
+  });
 });

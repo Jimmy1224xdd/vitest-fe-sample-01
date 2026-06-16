@@ -53,3 +53,26 @@ export function formatearTexto(texto) {
 
   return recortado.charAt(0).toUpperCase() + recortado.slice(1).toLowerCase();
 }
+
+/**
+ * Cuenta el número de palabras en un texto.
+ *
+ * @param {string} texto - El texto a evaluar.
+ * @returns {number} El número de palabras.
+ * @throws {Error} Si el argumento no es un string.
+ */
+export function contarPalabras(texto) {
+  if (typeof texto !== 'string') {
+    throw new Error('El argumento debe ser un texto (string).');
+  }
+
+  const recortado = texto.trim();
+
+  if (recortado.length === 0) {
+    return 0;
+  }
+
+  // Dividir por uno o más espacios en blanco
+  return recortado.split(/\s+/).length;
+}
+
